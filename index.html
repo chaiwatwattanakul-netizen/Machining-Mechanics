@@ -215,7 +215,7 @@
                         </div>
                     </div>
                     
-                    <!-- ส่วนแสดงผล กำลัง (Power) ที่เพิ่มเข้ามา -->
+                    <!-- ส่วนแสดงผล กำลัง (Power) -->
                     <div class="mt-3 p-2 bg-slate-50 rounded border border-slate-200">
                         <div class="text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">กำลังที่ใช้ (Power)</div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -309,12 +309,24 @@
                     <div class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>Vc = ความเร็วเศษ</div>
                     <div class="flex items-center"><span class="w-3 h-3 bg-teal-500 rounded-full mr-2"></span>Vs = ความเร็วเฉือน</div>
 
-                    <!-- Legend สำหรับ Heat Zones (ซ่อน/แสดง อัตโนมัติ) -->
+                    <!-- Legend สำหรับ Heat Zones (ซ่อน/แสดง อัตโนมัติ) พร้อมแสดงค่าอุณหภูมิ -->
                     <div id="legend-heat" class="border-t border-slate-200 pt-1.5 mt-1">
-                        <div class="font-bold text-rose-700 mb-1">โซนความร้อน (Heat Zones):</div>
-                        <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-300 to-rose-500 rounded-full mr-2 shadow-sm"></span>Primary (Shear Plane)</div>
-                        <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-200 to-orange-500 rounded-full mr-2 shadow-sm"></span>Secondary (Friction)</div>
-                        <div class="flex items-center"><span class="w-3 h-3 bg-red-600 rounded-full mr-2 shadow-sm"></span>Tertiary (Flank Rubbing)</div>
+                        <div class="font-bold text-rose-700 mb-1 flex items-center justify-between">
+                            <span>โซนความร้อน (Heat Zones)</span>
+                            <span class="text-[9px] font-normal text-slate-400 ml-2 bg-slate-100 px-1 rounded">ประมาณการ</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-0.5">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-300 to-rose-500 rounded-full mr-2 shadow-sm"></span>Primary</div>
+                            <span id="legend-heat-primary" class="font-bold text-slate-700">...</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-0.5">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-200 to-orange-500 rounded-full mr-2 shadow-sm"></span>Secondary</div>
+                            <span id="legend-heat-secondary" class="font-bold text-slate-700">...</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-red-600 rounded-full mr-2 shadow-sm"></span>Tertiary</div>
+                            <span id="legend-heat-tertiary" class="font-bold text-slate-700">...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -476,8 +488,31 @@
             ctx.textBaseline = "alphabetic";
         }
 
-        // --- ฟังก์ชันวาดโซนความร้อน (Heat Zones) ---
-        function drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen) {
+        // --- ฟังก์ชันสำหรับวาดป้ายอุณหภูมิ (Temperature Badge) ---
+        function drawTempBadge(ctx, x, y, temp) {
+            const text = temp + " °C";
+            ctx.font = "bold 11px 'Segoe UI', Arial";
+            const metrics = ctx.measureText(text);
+            const w = metrics.width + 12;
+            const h = 20;
+            
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)"; // สีพื้นหลังป้าย (Dark Slate)
+            ctx.beginPath();
+            ctx.roundRect(x - w/2, y - h/2, w, h, 4);
+            ctx.fill();
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, x, y);
+            
+            // รีเซ็ตการตั้งค่าตัวหนังสือ
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+        }
+
+        // --- ฟังก์ชันวาดโซนความร้อน (Heat Zones) พร้อมแสดงอุณหภูมิ ---
+        function drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tempPrimary, tempSecondary, tempTertiary) {
             ctx.save();
             
             // Helper function เพื่อวาดจุดวงกลมความร้อนแบบ Gradient
@@ -492,40 +527,54 @@
                 ctx.fill();
             }
 
-            // 1. Primary Shear Zone (บริเวณระนาบเฉือน - ความร้อนสูงจากการพลาสติกดีฟอร์ม)
+            // 1. Primary Shear Zone
             const shearDist = Math.hypot(centerX - shearX, centerY - shearY);
             const numPrimaryNodes = Math.max(5, Math.floor(shearDist / 12));
             for (let i = 0; i <= numPrimaryNodes; i++) {
                 const t = i / numPrimaryNodes;
                 const hx = shearX + (centerX - shearX) * t;
                 const hy = shearY + (centerY - shearY) * t;
-                // ความร้อนกระจายตัวตลอดแนว แต่อาจจะเข้มขึ้นเล็กน้อยตรงกลาง
                 const heatIntensity = 0.55 + 0.25 * Math.sin(t * Math.PI); 
-                drawHeatNode(hx, hy, 28, 239, 68, 68, heatIntensity, 255, 220, 100); // สีแดง-เหลือง
+                drawHeatNode(hx, hy, 28, 239, 68, 68, heatIntensity, 255, 220, 100); 
             }
 
-            // 2. Secondary Shear Zone (บริเวณหน้ามีดคายเศษ - ความร้อนจากความเสียดทาน)
+            // 2. Secondary Shear Zone
             const rakeDirX = Math.sin(aRad);
             const rakeDirY = -Math.cos(aRad);
-            const secHeatLen = chipLen * 0.55; // ความร้อนส่งไปตามเศษตัด
+            const secHeatLen = chipLen * 0.55;
             const numSecNodes = 8;
             for (let i = 0; i <= numSecNodes; i++) {
                 const t = i / numSecNodes;
-                // ความร้อนลดลงเมื่อห่างออกจากปลายมีด
                 const heatIntensity = 0.85 * (1 - t);
                 if (heatIntensity <= 0.05) continue;
                 
-                // ขยับศูนย์กลางความร้อนให้เข้ามาในเศษเล็กน้อย ไม่ให้อยู่บนหน้ามีดเป๊ะๆ
                 const offsetIntoChipX = -Math.cos(aRad) * 4;
                 const offsetIntoChipY = -Math.sin(aRad) * 4;
 
                 const hx = centerX + (secHeatLen * t) * rakeDirX + offsetIntoChipX;
                 const hy = centerY + (secHeatLen * t) * rakeDirY + offsetIntoChipY;
-                drawHeatNode(hx, hy, 22, 249, 115, 22, heatIntensity, 255, 230, 150); // สีส้ม-เหลือง
+                drawHeatNode(hx, hy, 22, 249, 115, 22, heatIntensity, 255, 230, 150); 
             }
 
-            // 3. Tertiary Zone (บริเวณปลายมีด/มุมหลบ - การเสียดสีกับชิ้นงานใหม่)
-            drawHeatNode(centerX - 4, centerY + 4, 16, 220, 38, 38, 0.7, 255, 100, 100); // สีแดงเข้ม
+            // 3. Tertiary Zone
+            drawHeatNode(centerX - 4, centerY + 4, 16, 220, 38, 38, 0.7, 255, 100, 100);
+
+            // ===============================================
+            // วาดป้ายอุณหภูมิ (Temperature Badges) ทับลงบนโซน
+            // ===============================================
+            
+            // ตำแหน่ง Primary (ตรงกลางระนาบเฉือน ขยับออกไปนิดหน่อย)
+            const midShearX = shearX + (centerX - shearX) * 0.5;
+            const midShearY = shearY + (centerY - shearY) * 0.5;
+            drawTempBadge(ctx, midShearX - 35, midShearY - 15, tempPrimary);
+
+            // ตำแหน่ง Secondary (บนหน้ามีด ขยับขึ้นตามเศษ)
+            const midSecX = centerX + (secHeatLen * 0.4) * rakeDirX - Math.cos(aRad) * 15;
+            const midSecY = centerY + (secHeatLen * 0.4) * rakeDirY - Math.sin(aRad) * 15;
+            drawTempBadge(ctx, midSecX - 25, midSecY - 25, tempSecondary);
+
+            // ตำแหน่ง Tertiary (ที่ปลายมีด ขยับลงล่างซ้ายเล็กน้อย)
+            drawTempBadge(ctx, centerX - 35, centerY + 25, tempTertiary);
 
             ctx.restore();
         }
@@ -607,11 +656,6 @@
             vVal.innerText = V + " m/min";
             t1Val.innerText = t1_val.toFixed(2) + " mm";
 
-            // จัดการการแสดง/ซ่อน Legend ของ Heat Zones
-            if(legendHeat) {
-                legendHeat.style.display = toggleHeat.checked ? 'block' : 'none';
-            }
-
             const aRad = degToRad(alpha);
             const bRad = degToRad(betaDeg);
 
@@ -636,6 +680,22 @@
             const Ps = (Fs * Vs) / 60;
             const Pf = (F * Vc) / 60;
             
+            // คำนวณอุณหภูมิโดยประมาณ (Educational Estimation) เพื่อให้เห็นภาพผลกระทบ
+            const T0 = 30; // อุณหภูมิห้อง
+            const tPrimary = Math.round(T0 + (Ps * 0.45) + (V * 0.2)); 
+            const tSecondary = Math.round(tPrimary + (Pf * 0.8) + (Vc * 0.5)); // มักจะร้อนที่สุดจากแรงเสียดทาน
+            const tTertiary = Math.round(T0 + (V * 0.8) + (Fc * 0.05));
+
+            // อัปเดต Legend ของ Heat Zones
+            if(legendHeat) {
+                legendHeat.style.display = toggleHeat.checked ? 'block' : 'none';
+                if(toggleHeat.checked) {
+                    document.getElementById('legend-heat-primary').innerText = `${tPrimary}°C`;
+                    document.getElementById('legend-heat-secondary').innerText = `${tSecondary}°C`;
+                    document.getElementById('legend-heat-tertiary').innerText = `${tTertiary}°C`;
+                }
+            }
+            
             let ratioText = "∞";
             if (Ft !== 0) ratioText = (Fc / Ft).toFixed(2);
 
@@ -658,10 +718,12 @@
             resPf.innerText = Pf.toFixed(1) + " W";
 
             updateAnalysis(mu, phi, alpha, betaDeg);
-            draw(alpha, gamma, phi, Fc, Ft, F, N, Fs, Fn, betaDeg, V, Vc, Vs, t1_val);
+            
+            // ส่งค่าอุณหภูมิที่ประมาณการไปวาดบน Canvas
+            draw(alpha, gamma, phi, Fc, Ft, F, N, Fs, Fn, betaDeg, V, Vc, Vs, t1_val, tPrimary, tSecondary, tTertiary);
         }
 
-        function draw(alpha, gamma, phi, Fc, Ft, F, N, Fs, Fn, betaDeg, V, Vc, Vs, t1_val) {
+        function draw(alpha, gamma, phi, Fc, Ft, F, N, Fs, Fn, betaDeg, V, Vc, Vs, t1_val, tPrimary, tSecondary, tTertiary) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const width = canvas.width;
@@ -739,7 +801,7 @@
             // 1.5 วาดโซนความร้อน (Heat Zones)
             // ==========================================
             if (toggleHeat.checked) {
-                drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen);
+                drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tPrimary, tSecondary, tTertiary);
             }
 
             // ==========================================
