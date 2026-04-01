@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>สื่อการสอน: วงกลมของเมอร์แชนท์ และสามเหลี่ยมความเร็ว</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -17,18 +17,24 @@
             justify-content: center;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* ป้องกันการเด้งเวลาเลื่อนบนมือถือ (Pull-to-refresh) */
+            overscroll-behavior-y: contain; 
         }
 
         .app-container {
             width: 100%;
             height: 100%;
-            max-width: calc(100vh * 16 / 9);
-            max-height: calc(100vw * 9 / 16);
             background: #ffffff;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: row;
             overflow: hidden;
+        }
+
+        /* บังคับสัดส่วนเมื่อเป็นหน้าจอขนาดใหญ่ (Tablet/Desktop) */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: calc(100vh * 16 / 9);
+                max-height: calc(100vw * 9 / 16);
+            }
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -57,8 +63,8 @@
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #2563eb;
             cursor: pointer;
@@ -75,57 +81,58 @@
 </head>
 <body>
 
-    <div class="app-container rounded-none sm:rounded-2xl sm:border border-slate-700">
+    <!-- เปลี่ยนจากบรรทัดเดียวเป็น flex-col-reverse บนมือถือ และ flex-row บนคอมฯ -->
+    <div class="app-container flex flex-col-reverse md:flex-row rounded-none sm:rounded-2xl sm:border border-slate-700">
         
-        <!-- แผงควบคุม (ด้านซ้าย 30%) -->
-        <div class="w-[30%] min-w-[320px] flex flex-col bg-slate-50 border-r border-slate-200 shadow-z-10 z-10">
+        <!-- แผงควบคุม (ด้านล่างบนมือถือ / ด้านซ้ายบนคอมฯ) -->
+        <div class="w-full h-[55%] md:h-full md:w-[30%] md:min-w-[320px] flex flex-col bg-slate-50 border-t md:border-t-0 md:border-r border-slate-200 shadow-z-10 z-10">
             <!-- หัวข้อ -->
-            <div class="p-4 bg-slate-800 text-white shrink-0">
-                <h1 class="text-lg font-bold leading-tight">กลศาสตร์การตัดเฉือน</h1>
-                <p class="text-xs text-slate-300 mt-1">Merchant's Circle & Velocity Triangle</p>
+            <div class="p-3 md:p-4 bg-slate-800 text-white shrink-0">
+                <h1 class="text-base md:text-lg font-bold leading-tight">กลศาสตร์การตัดเฉือน</h1>
+                <p class="text-[10px] md:text-xs text-slate-300 mt-1">Merchant's Circle & Velocity Triangle</p>
             </div>
             
             <!-- ส่วนปรับค่าและแสดงผล -->
-            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto p-3 md:p-4 flex flex-col gap-3 md:gap-4 custom-scrollbar pb-6 md:pb-4">
                 
                 <!-- 1. พารามิเตอร์ -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider flex items-center">
+                <div class="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-[11px] md:text-xs font-bold text-slate-500 mb-2 md:mb-3 uppercase tracking-wider flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                         ปรับค่ามุม (Angles)
                     </h2>
                     
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                    <div class="mb-2 md:mb-3">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>มุมคาย (α)</span>
                             <span id="alpha-val" class="text-blue-600">10°</span>
                         </label>
                         <input type="range" id="alpha-slider" min="-10" max="40" value="10">
                     </div>
 
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                    <div class="mb-2 md:mb-3">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>มุมหลบ (γ)</span>
                             <span id="gamma-val" class="text-purple-600">8°</span>
                         </label>
                         <input type="range" id="gamma-slider" min="2" max="20" value="8" style="accent-color: #a855f7;">
                     </div>
 
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                    <div class="mb-2 md:mb-3">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>มุมเสียดทาน (β)</span>
                             <span id="beta-val" class="text-amber-600">25°</span>
                         </label>
                         <input type="range" id="beta-slider" min="10" max="60" value="25" style="accent-color: #f59e0b;">
                     </div>
 
-                    <h2 class="text-xs font-bold text-slate-500 mb-3 mt-4 uppercase tracking-wider flex items-center border-t pt-3">
+                    <h2 class="text-[11px] md:text-xs font-bold text-slate-500 mb-2 md:mb-3 mt-3 md:mt-4 uppercase tracking-wider flex items-center border-t pt-2 md:pt-3">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         ปรับค่าแรง (Forces)
                     </h2>
 
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                    <div class="mb-2 md:mb-3">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>แรงตัด (Fc)</span>
                             <span id="fc-val" class="text-red-500">500 N</span>
                         </label>
@@ -133,28 +140,28 @@
                     </div>
 
                     <div class="mb-1">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>แรงต้านการตัด (Ft)</span>
                             <span id="ft-val" class="text-red-500">250 N</span>
                         </label>
                         <input type="range" id="ft-slider" min="-200" max="1000" value="250" style="accent-color: #f43f5e;">
                     </div>
 
-                    <h2 class="text-xs font-bold text-slate-500 mb-3 mt-4 uppercase tracking-wider flex items-center border-t pt-3">
+                    <h2 class="text-[11px] md:text-xs font-bold text-slate-500 mb-2 md:mb-3 mt-3 md:mt-4 uppercase tracking-wider flex items-center border-t pt-2 md:pt-3">
                         <svg class="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         พารามิเตอร์การตัด (Parameters)
                     </h2>
 
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
-                            <span>ความหนาเศษก่อนตัด (t₁)</span>
+                    <div class="mb-2 md:mb-3">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
+                            <span>ความหนาก่อนตัด (t₁)</span>
                             <span id="t1-val" class="text-cyan-600">0.20 mm</span>
                         </label>
                         <input type="range" id="t1-slider" min="0.05" max="0.40" step="0.01" value="0.20" style="accent-color: #0891b2;">
                     </div>
 
                     <div class="mb-1">
-                        <label class="flex justify-between text-xs font-semibold text-slate-700">
+                        <label class="flex justify-between text-[11px] md:text-xs font-semibold text-slate-700">
                             <span>ความเร็วตัด (V)</span>
                             <span id="v-val" class="text-orange-500">100 m/min</span>
                         </label>
@@ -163,168 +170,161 @@
                 </div>
 
                 <!-- 2. ผลการคำนวณ -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider flex items-center">
+                <div class="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-[11px] md:text-xs font-bold text-slate-500 mb-2 md:mb-3 uppercase tracking-wider flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         ค่าที่คำนวณได้
                     </h2>
                     
-                    <div class="grid grid-cols-2 gap-2 text-xs mb-2">
-                        <div class="p-2 bg-emerald-50/50 rounded border border-emerald-100">
+                    <div class="grid grid-cols-2 gap-1.5 md:gap-2 text-[10px] md:text-xs mb-2">
+                        <div class="p-1.5 md:p-2 bg-emerald-50/50 rounded border border-emerald-100">
                             <span class="text-slate-500">มุมระนาบเฉือน (φ)</span><br>
-                            <span id="res-phi" class="font-bold text-emerald-700 text-sm">-</span>
+                            <span id="res-phi" class="font-bold text-emerald-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                        <div class="p-1.5 md:p-2 bg-slate-50 rounded border border-slate-200">
                             <span class="text-slate-500">แรงลัพธ์ (R)</span><br>
-                            <span id="res-r" class="font-bold text-slate-700 text-sm">-</span>
+                            <span id="res-r" class="font-bold text-slate-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-blue-50/50 rounded border border-blue-100">
+                        <div class="p-1.5 md:p-2 bg-blue-50/50 rounded border border-blue-100">
                             <span class="text-slate-500">แรงเสียดทาน (F)</span><br>
-                            <span id="res-f" class="font-bold text-blue-700 text-sm">-</span>
+                            <span id="res-f" class="font-bold text-blue-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-blue-50/50 rounded border border-blue-100">
+                        <div class="p-1.5 md:p-2 bg-blue-50/50 rounded border border-blue-100">
                             <span class="text-slate-500">แรงตั้งฉาก (N)</span><br>
-                            <span id="res-n" class="font-bold text-blue-700 text-sm">-</span>
+                            <span id="res-n" class="font-bold text-blue-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-emerald-50/50 rounded border border-emerald-100">
+                        <div class="p-1.5 md:p-2 bg-emerald-50/50 rounded border border-emerald-100">
                             <span class="text-slate-500">แรงเฉือน (Fs)</span><br>
-                            <span id="res-fs" class="font-bold text-emerald-700 text-sm">-</span>
+                            <span id="res-fs" class="font-bold text-emerald-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-emerald-50/50 rounded border border-emerald-100">
+                        <div class="p-1.5 md:p-2 bg-emerald-50/50 rounded border border-emerald-100">
                             <span class="text-slate-500">แรงตั้งฉากเฉือน (Fn)</span><br>
-                            <span id="res-fn" class="font-bold text-emerald-700 text-sm">-</span>
+                            <span id="res-fn" class="font-bold text-emerald-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-cyan-50/50 rounded border border-cyan-100">
+                        <div class="p-1.5 md:p-2 bg-cyan-50/50 rounded border border-cyan-100">
                             <span class="text-slate-500">ความหนาเศษ (tc)</span><br>
-                            <span id="res-tc" class="font-bold text-cyan-700 text-sm">-</span>
+                            <span id="res-tc" class="font-bold text-cyan-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-slate-100 rounded border border-slate-200">
+                        <div class="p-1.5 md:p-2 bg-slate-100 rounded border border-slate-200">
                             <span class="text-slate-500">สัดส่วนเศษ (r)</span><br>
-                            <span id="res-r-chip" class="font-bold text-slate-700 text-sm">-</span>
+                            <span id="res-r-chip" class="font-bold text-slate-700 text-xs md:text-sm">-</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 text-xs mt-3 border-t border-slate-100 pt-3">
-                        <div class="p-2 bg-indigo-50/50 rounded border border-indigo-100">
+                    <div class="grid grid-cols-2 gap-1.5 md:gap-2 text-[10px] md:text-xs mt-2 md:mt-3 border-t border-slate-100 pt-2 md:pt-3">
+                        <div class="p-1.5 md:p-2 bg-indigo-50/50 rounded border border-indigo-100">
                             <span class="text-slate-500">ความเร็วเศษ (Vc)</span><br>
-                            <span id="res-vc" class="font-bold text-indigo-700 text-sm">-</span>
+                            <span id="res-vc" class="font-bold text-indigo-700 text-xs md:text-sm">-</span>
                         </div>
-                        <div class="p-2 bg-teal-50/50 rounded border border-teal-100">
+                        <div class="p-1.5 md:p-2 bg-teal-50/50 rounded border border-teal-100">
                             <span class="text-slate-500">ความเร็วเฉือน (Vs)</span><br>
-                            <span id="res-vs" class="font-bold text-teal-700 text-sm">-</span>
+                            <span id="res-vs" class="font-bold text-teal-700 text-xs md:text-sm">-</span>
                         </div>
                     </div>
                     
                     <!-- ส่วนแสดงผล กำลัง (Power) -->
-                    <div class="mt-3 p-2 bg-slate-50 rounded border border-slate-200">
-                        <div class="text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">กำลังที่ใช้ (Power)</div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                             <div class="p-2 bg-rose-50/50 rounded border border-rose-100 col-span-2 flex justify-between items-center">
+                    <div class="mt-2 md:mt-3 p-1.5 md:p-2 bg-slate-50 rounded border border-slate-200">
+                        <div class="text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5 md:mb-2 uppercase tracking-wider">กำลังที่ใช้ (Power)</div>
+                        <div class="grid grid-cols-2 gap-1.5 md:gap-2 text-[10px] md:text-xs">
+                             <div class="p-1.5 md:p-2 bg-rose-50/50 rounded border border-rose-100 col-span-2 flex justify-between items-center">
                                 <span class="text-slate-600 font-semibold">กำลังตัดรวม (Pc)</span>
-                                <span id="res-pc" class="font-bold text-rose-700 text-sm">-</span>
+                                <span id="res-pc" class="font-bold text-rose-700 text-xs md:text-sm">-</span>
                             </div>
-                            <div class="p-2 bg-teal-50/50 rounded border border-teal-100">
+                            <div class="p-1.5 md:p-2 bg-teal-50/50 rounded border border-teal-100">
                                 <span class="text-slate-500">กำลังเฉือน (Ps)</span><br>
-                                <span id="res-ps" class="font-bold text-teal-700 text-sm">-</span>
+                                <span id="res-ps" class="font-bold text-teal-700 text-xs md:text-sm">-</span>
                             </div>
-                            <div class="p-2 bg-indigo-50/50 rounded border border-indigo-100">
+                            <div class="p-1.5 md:p-2 bg-indigo-50/50 rounded border border-indigo-100">
                                 <span class="text-slate-500">กำลังเสียดทาน (Pf)</span><br>
-                                <span id="res-pf" class="font-bold text-indigo-700 text-sm">-</span>
+                                <span id="res-pf" class="font-bold text-indigo-700 text-xs md:text-sm">-</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-3 p-2.5 bg-slate-50 rounded border border-slate-200 text-slate-800 flex flex-col gap-2">
+                    <div class="mt-2 md:mt-3 p-2 md:p-2.5 bg-slate-50 rounded border border-slate-200 text-slate-800 flex flex-col gap-1.5 md:gap-2">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold">สัมประสิทธิ์ความเสียดทาน (μ)</span>
-                            <span id="res-mu" class="font-bold text-base">0.50</span>
+                            <span class="text-[11px] md:text-xs font-semibold">สัมประสิทธิ์ความเสียดทาน (μ)</span>
+                            <span id="res-mu" class="font-bold text-sm md:text-base">0.50</span>
                         </div>
-                        <div class="flex justify-between items-center border-t border-slate-200 pt-2">
-                            <span class="text-xs font-semibold">อัตราส่วน Fc / Ft</span>
-                            <span id="res-ratio" class="font-bold text-base">2.00</span>
+                        <div class="flex justify-between items-center border-t border-slate-200 pt-1.5 md:pt-2">
+                            <span class="text-[11px] md:text-xs font-semibold">อัตราส่วน Fc / Ft</span>
+                            <span id="res-ratio" class="font-bold text-sm md:text-base">2.00</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 3. ส่วนการแสดงผล & วิเคราะห์ผล -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mt-auto shrink-0 flex flex-col gap-3">
+                <div class="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-slate-200 mt-auto shrink-0 flex flex-col gap-2 md:gap-3">
                     
                     <!-- โซนความร้อน Toggle -->
-                    <div class="flex items-center justify-between p-2.5 bg-rose-50 rounded-lg border border-rose-100 transition-colors hover:bg-rose-100/50">
-                        <label for="toggle-heat" class="text-[13px] font-bold text-rose-700 cursor-pointer flex items-center flex-1">
-                            <svg class="w-4 h-4 mr-1.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
-                            แสดงโซนความร้อน (Heat Zones)
+                    <div class="flex items-center justify-between p-2 md:p-2.5 bg-rose-50 rounded-lg border border-rose-100 transition-colors hover:bg-rose-100/50">
+                        <label for="toggle-heat" class="text-[11px] md:text-[13px] font-bold text-rose-700 cursor-pointer flex items-center flex-1">
+                            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                            แสดงโซนความร้อน (Heat)
                         </label>
                         <input type="checkbox" id="toggle-heat" class="w-4 h-4 cursor-pointer accent-rose-600 rounded" checked>
                     </div>
 
-                    <h2 class="text-xs font-bold text-slate-700 mt-1 uppercase tracking-wider flex items-center">
-                        <svg class="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        วิเคราะห์สภาวะการตัดเฉือน
+                    <h2 class="text-[11px] md:text-xs font-bold text-slate-700 mt-1 uppercase tracking-wider flex items-center">
+                        <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        วิเคราะห์ผล
                     </h2>
-                    <div id="analysis-friction" class="text-xs p-2.5 rounded-lg border leading-relaxed">
+                    <div id="analysis-friction" class="text-[10px] md:text-xs p-2 md:p-2.5 rounded-lg border leading-relaxed">
                         <!-- ข้อความวิเคราะห์ความเสียดทาน -->
                     </div>
-                    <div id="analysis-energy" class="text-xs p-2.5 rounded-lg border leading-relaxed">
+                    <div id="analysis-energy" class="text-[10px] md:text-xs p-2 md:p-2.5 rounded-lg border leading-relaxed">
                         <!-- ข้อความวิเคราะห์พลังงาน/มุมเฉือน -->
                     </div>
                 </div>
 
                 <!-- ปุ่มส่งออกข้อมูล -->
-                <button id="btn-export" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-sm transition-colors flex justify-center items-center shrink-0">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <button id="btn-export" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] md:text-sm font-semibold py-2 md:py-2.5 px-4 rounded-xl shadow-sm transition-colors flex justify-center items-center shrink-0">
+                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     ส่งออกข้อมูล (Export CSV)
                 </button>
 
             </div>
         </div>
 
-        <!-- พื้นที่กราฟิก (ด้านขวา 70%) -->
-        <div class="w-[70%] relative bg-white" id="canvas-container">
-            <!-- สมการของ Merchant (ตรงกลางด้านบน) -->
-            <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-5 py-2 rounded-xl shadow-sm border border-slate-200 z-10 text-center pointer-events-none">
-                <div class="text-[11px] text-slate-500 font-bold mb-0.5">สมการอุดมคติของ Merchant</div>
-                <div class="text-base font-bold text-slate-800 tracking-wide">
+        <!-- พื้นที่กราฟิก (ด้านบนบนมือถือ / ด้านขวาบนคอมฯ) -->
+        <div class="w-full h-[45%] md:h-full md:w-[70%] relative bg-white" id="canvas-container">
+            <!-- สมการของ Merchant -->
+            <div class="absolute top-2 md:top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-3 md:px-5 py-1 md:py-2 rounded-xl shadow-sm border border-slate-200 z-10 text-center pointer-events-none">
+                <div class="text-[9px] md:text-[11px] text-slate-500 font-bold mb-0 md:mb-0.5">สมการของ Merchant</div>
+                <div class="text-xs md:text-base font-bold text-slate-800 tracking-wide">
                     <span class="text-emerald-600">φ</span> = 45° + <span class="text-blue-600">α</span>/2 - <span class="text-amber-500">β</span>/2
                 </div>
             </div>
 
-            <!-- คำอธิบายเส้น (Legend) -->
-            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm border border-slate-200 z-10 max-h-[90vh] overflow-y-auto">
-                <div class="flex flex-col space-y-1.5 text-[11px] font-medium text-slate-600">
-                    <div class="font-bold text-slate-700">เวกเตอร์แรง (Forces):</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>Fc, Ft (แรงที่วัดได้)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>F, N (ที่หน้ามีด)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>Fs, Fn (ระนาบเฉือน)</div>
+            <!-- คำอธิบายเส้น (Legend) ย่อขนาดลงบนมือถือ -->
+            <div class="absolute top-2 right-2 md:top-4 md:right-4 bg-white/85 md:bg-white/90 backdrop-blur px-2 md:px-3 py-1.5 md:py-2 rounded-lg shadow-sm border border-slate-200 z-10 max-h-[35vh] md:max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div class="flex flex-col space-y-1 md:space-y-1.5 text-[9px] md:text-[11px] font-medium text-slate-600">
+                    <div class="font-bold text-slate-700 hidden md:block">เวกเตอร์แรง (Forces):</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-red-500 rounded-full mr-1.5 md:mr-2"></span>Fc, Ft (แรงวัดได้)</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-blue-500 rounded-full mr-1.5 md:mr-2"></span>F, N (หน้ามีด)</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-emerald-500 rounded-full mr-1.5 md:mr-2"></span>Fs, Fn (ระนาบเฉือน)</div>
                     
-                    <div class="border-t border-slate-200 pt-1.5 mt-1 font-bold text-slate-700">พารามิเตอร์/มุม:</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>α = มุมคาย (Rake)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>γ = มุมหลบ (Clearance)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>φ = มุมเฉือน (Shear)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>β = มุมเสียดทาน (Friction)</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-cyan-500 rounded-full mr-2"></span>t₁, tc = ความหนาเศษ</div>
-
-                    <div class="border-t border-slate-200 pt-1.5 mt-1 font-bold text-slate-700">เวกเตอร์ความเร็ว (Velocities):</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>V = ความเร็วตัด</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>Vc = ความเร็วเศษ</div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-teal-500 rounded-full mr-2"></span>Vs = ความเร็วเฉือน</div>
-
-                    <!-- Legend สำหรับ Heat Zones (ซ่อน/แสดง อัตโนมัติ) พร้อมแสดงค่าอุณหภูมิ -->
-                    <div id="legend-heat" class="border-t border-slate-200 pt-1.5 mt-1">
-                        <div class="font-bold text-rose-700 mb-1 flex items-center justify-between">
-                            <span>โซนความร้อน (Heat Zones)</span>
-                            <span class="text-[9px] font-normal text-slate-400 ml-2 bg-slate-100 px-1 rounded">ประมาณการ</span>
+                    <div class="border-t border-slate-200 pt-1 md:pt-1.5 mt-1 font-bold text-slate-700 hidden md:block">พารามิเตอร์/มุม:</div>
+                    <div class="items-center hidden md:flex"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-blue-500 rounded-full mr-1.5 md:mr-2"></span>α = มุมคาย (Rake)</div>
+                    <div class="items-center hidden md:flex"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-purple-500 rounded-full mr-1.5 md:mr-2"></span>γ = มุมหลบ (Clear)</div>
+                    <div class="items-center hidden md:flex"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-emerald-500 rounded-full mr-1.5 md:mr-2"></span>φ = มุมเฉือน (Shear)</div>
+                    
+                    <!-- Legend สำหรับ Heat Zones (ซ่อน/แสดง อัตโนมัติ) -->
+                    <div id="legend-heat" class="border-t border-slate-200 pt-1 md:pt-1.5 mt-1">
+                        <div class="font-bold text-rose-700 mb-0.5 md:mb-1 flex items-center justify-between">
+                            <span>โซนความร้อน</span>
+                            <span class="text-[8px] md:text-[9px] font-normal text-slate-400 ml-1 md:ml-2 bg-slate-100 px-1 rounded">ประมาณการ</span>
                         </div>
                         <div class="flex items-center justify-between mb-0.5">
-                            <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-300 to-rose-500 rounded-full mr-2 shadow-sm"></span>Primary</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-gradient-to-r from-yellow-300 to-rose-500 rounded-full mr-1.5 md:mr-2 shadow-sm"></span>Zone 1</div>
                             <span id="legend-heat-primary" class="font-bold text-slate-700">...</span>
                         </div>
                         <div class="flex items-center justify-between mb-0.5">
-                            <div class="flex items-center"><span class="w-3 h-3 bg-gradient-to-r from-yellow-200 to-orange-500 rounded-full mr-2 shadow-sm"></span>Secondary</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-gradient-to-r from-yellow-200 to-orange-500 rounded-full mr-1.5 md:mr-2 shadow-sm"></span>Zone 2</div>
                             <span id="legend-heat-secondary" class="font-bold text-slate-700">...</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center"><span class="w-3 h-3 bg-red-600 rounded-full mr-2 shadow-sm"></span>Tertiary</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 md:w-3 md:h-3 bg-red-600 rounded-full mr-1.5 md:mr-2 shadow-sm"></span>Zone 3</div>
                             <span id="legend-heat-tertiary" class="font-bold text-slate-700">...</span>
                         </div>
                     </div>
@@ -385,10 +385,10 @@
         function degToRad(deg) { return deg * Math.PI / 180; }
 
         function drawArrow(x1, y1, x2, y2, color, label, options = {}) {
-            const headlen = 12;
+            const headlen = 10 * (options.physScale || 1); // ย่อขนาดหัวลูกศรตามสเกล
             const angle = Math.atan2(y2 - y1, x2 - x1);
             
-            const lw = options.lineWidth || 2.5;
+            const lw = (options.lineWidth || 2.5) * Math.min((options.physScale || 1), 1);
             const dash = options.dash || [];
             const textSide = options.textSide || 1;
             const textDist = options.textDist !== undefined ? options.textDist : 15;
@@ -411,13 +411,14 @@
             ctx.fill();
 
             if (label) {
-                ctx.font = "bold 13px 'Segoe UI', Arial";
+                const fontSize = Math.max(10, Math.floor(13 * Math.min((options.physScale || 1), 1)));
+                ctx.font = `bold ${fontSize}px 'Segoe UI', Arial`;
                 const midX = (x1 + x2) / 2;
                 const midY = (y1 + y2) / 2;
                 const perpX = -Math.sin(angle) * textSide;
                 const perpY = Math.cos(angle) * textSide;
-                const textX = midX + perpX * textDist;
-                const textY = midY + perpY * textDist;
+                const textX = midX + perpX * (textDist * (options.physScale || 1));
+                const textY = midY + perpY * (textDist * (options.physScale || 1));
                 
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
@@ -431,19 +432,20 @@
             }
         }
 
-        function drawAngleArc(x, y, radius, a1, a2, color, label) {
+        function drawAngleArc(x, y, radius, a1, a2, color, label, physScale) {
             const start = Math.min(a1, a2);
             const end = Math.max(a1, a2);
+            const r = radius * physScale;
             
             ctx.beginPath();
-            ctx.arc(x, y, radius, start, end, false);
+            ctx.arc(x, y, r, start, end, false);
             ctx.strokeStyle = color;
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 2 * Math.min(physScale, 1);
             ctx.stroke();
 
             ctx.beginPath();
             ctx.moveTo(x, y);
-            ctx.arc(x, y, radius, start, end, false);
+            ctx.arc(x, y, r, start, end, false);
             ctx.closePath();
             ctx.fillStyle = color;
             ctx.globalAlpha = 0.15;
@@ -452,11 +454,12 @@
 
             if (label) {
                 const mid = (start + end) / 2;
-                const textDist = radius + 22;
+                const textDist = r + (18 * physScale);
                 const textX = x + textDist * Math.cos(mid);
                 const textY = y + textDist * Math.sin(mid);
 
-                ctx.font = "bold 13px 'Segoe UI', Arial";
+                const fontSize = Math.max(10, Math.floor(13 * Math.min(physScale, 1)));
+                ctx.font = `bold ${fontSize}px 'Segoe UI', Arial`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.strokeStyle = "rgba(255,255,255,0.9)";
@@ -467,11 +470,12 @@
             }
         }
 
-        function drawTextLabel(x, y, text, bgColor="#ffffff", textColor="#1e293b") {
-            ctx.font = "bold 13px 'Segoe UI', Arial";
+        function drawTextLabel(x, y, text, bgColor="#ffffff", textColor="#1e293b", physScale=1) {
+            const fontSize = Math.max(10, Math.floor(13 * Math.min(physScale, 1)));
+            ctx.font = `bold ${fontSize}px 'Segoe UI', Arial`;
             const metrics = ctx.measureText(text);
-            const width = metrics.width + 16;
-            const height = 24;
+            const width = metrics.width + (16 * physScale);
+            const height = 24 * Math.min(physScale, 1);
             
             ctx.fillStyle = bgColor;
             ctx.globalAlpha = 0.85;
@@ -488,15 +492,15 @@
             ctx.textBaseline = "alphabetic";
         }
 
-        // --- ฟังก์ชันสำหรับวาดป้ายอุณหภูมิ (Temperature Badge) ---
-        function drawTempBadge(ctx, x, y, temp) {
+        function drawTempBadge(ctx, x, y, temp, physScale=1) {
             const text = temp + " °C";
-            ctx.font = "bold 11px 'Segoe UI', Arial";
+            const fontSize = Math.max(9, Math.floor(11 * Math.min(physScale, 1)));
+            ctx.font = `bold ${fontSize}px 'Segoe UI', Arial`;
             const metrics = ctx.measureText(text);
-            const w = metrics.width + 12;
-            const h = 20;
+            const w = metrics.width + (12 * physScale);
+            const h = 20 * Math.min(physScale, 1);
             
-            ctx.fillStyle = "rgba(15, 23, 42, 0.85)"; // สีพื้นหลังป้าย (Dark Slate)
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)"; 
             ctx.beginPath();
             ctx.roundRect(x - w/2, y - h/2, w, h, 4);
             ctx.fill();
@@ -505,76 +509,68 @@
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(text, x, y);
-            
-            // รีเซ็ตการตั้งค่าตัวหนังสือ
             ctx.textAlign = "left";
             ctx.textBaseline = "alphabetic";
         }
 
-        // --- ฟังก์ชันวาดโซนความร้อน (Heat Zones) พร้อมแสดงอุณหภูมิ ---
-        function drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tempPrimary, tempSecondary, tempTertiary) {
+        function drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tempPrimary, tempSecondary, tempTertiary, physScale) {
             ctx.save();
             
-            // Helper function เพื่อวาดจุดวงกลมความร้อนแบบ Gradient
             function drawHeatNode(x, y, radius, r, g, b, alphaStr, coreR=255, coreG=255, coreB=200) {
                 const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-                grad.addColorStop(0, `rgba(${coreR}, ${coreG}, ${coreB}, ${alphaStr})`); // แกนกลางที่ร้อนที่สุด
-                grad.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, ${alphaStr * 0.8})`);     // สีหลัก
-                grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);                       // ขอบจางๆ
+                grad.addColorStop(0, `rgba(${coreR}, ${coreG}, ${coreB}, ${alphaStr})`);
+                grad.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, ${alphaStr * 0.8})`);     
+                grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);                       
                 ctx.fillStyle = grad;
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // 1. Primary Shear Zone
+            // 1. Primary
             const shearDist = Math.hypot(centerX - shearX, centerY - shearY);
-            const numPrimaryNodes = Math.max(5, Math.floor(shearDist / 12));
+            const numPrimaryNodes = Math.max(5, Math.floor(shearDist / (12 * physScale)));
+            const primaryRad = 28 * physScale;
             for (let i = 0; i <= numPrimaryNodes; i++) {
                 const t = i / numPrimaryNodes;
                 const hx = shearX + (centerX - shearX) * t;
                 const hy = shearY + (centerY - shearY) * t;
                 const heatIntensity = 0.55 + 0.25 * Math.sin(t * Math.PI); 
-                drawHeatNode(hx, hy, 28, 239, 68, 68, heatIntensity, 255, 220, 100); 
+                drawHeatNode(hx, hy, primaryRad, 239, 68, 68, heatIntensity, 255, 220, 100); 
             }
 
-            // 2. Secondary Shear Zone
+            // 2. Secondary
             const rakeDirX = Math.sin(aRad);
             const rakeDirY = -Math.cos(aRad);
             const secHeatLen = chipLen * 0.55;
             const numSecNodes = 8;
+            const secRad = 22 * physScale;
             for (let i = 0; i <= numSecNodes; i++) {
                 const t = i / numSecNodes;
                 const heatIntensity = 0.85 * (1 - t);
                 if (heatIntensity <= 0.05) continue;
                 
-                const offsetIntoChipX = -Math.cos(aRad) * 4;
-                const offsetIntoChipY = -Math.sin(aRad) * 4;
+                const offsetIntoChipX = -Math.cos(aRad) * (4 * physScale);
+                const offsetIntoChipY = -Math.sin(aRad) * (4 * physScale);
 
                 const hx = centerX + (secHeatLen * t) * rakeDirX + offsetIntoChipX;
                 const hy = centerY + (secHeatLen * t) * rakeDirY + offsetIntoChipY;
-                drawHeatNode(hx, hy, 22, 249, 115, 22, heatIntensity, 255, 230, 150); 
+                drawHeatNode(hx, hy, secRad, 249, 115, 22, heatIntensity, 255, 230, 150); 
             }
 
-            // 3. Tertiary Zone
-            drawHeatNode(centerX - 4, centerY + 4, 16, 220, 38, 38, 0.7, 255, 100, 100);
+            // 3. Tertiary
+            drawHeatNode(centerX - (4*physScale), centerY + (4*physScale), 16 * physScale, 220, 38, 38, 0.7, 255, 100, 100);
 
-            // ===============================================
-            // วาดป้ายอุณหภูมิ (Temperature Badges) ทับลงบนโซน
-            // ===============================================
-            
-            // ตำแหน่ง Primary (ตรงกลางระนาบเฉือน ขยับออกไปนิดหน่อย)
+            // Badges
             const midShearX = shearX + (centerX - shearX) * 0.5;
             const midShearY = shearY + (centerY - shearY) * 0.5;
-            drawTempBadge(ctx, midShearX - 35, midShearY - 15, tempPrimary);
+            drawTempBadge(ctx, midShearX - (35*physScale), midShearY - (15*physScale), tempPrimary, physScale);
 
-            // ตำแหน่ง Secondary (บนหน้ามีด ขยับขึ้นตามเศษ)
-            const midSecX = centerX + (secHeatLen * 0.4) * rakeDirX - Math.cos(aRad) * 15;
-            const midSecY = centerY + (secHeatLen * 0.4) * rakeDirY - Math.sin(aRad) * 15;
-            drawTempBadge(ctx, midSecX - 25, midSecY - 25, tempSecondary);
+            const midSecX = centerX + (secHeatLen * 0.4) * rakeDirX - Math.cos(aRad) * (15*physScale);
+            const midSecY = centerY + (secHeatLen * 0.4) * rakeDirY - Math.sin(aRad) * (15*physScale);
+            drawTempBadge(ctx, midSecX - (25*physScale), midSecY - (25*physScale), tempSecondary, physScale);
 
-            // ตำแหน่ง Tertiary (ที่ปลายมีด ขยับลงล่างซ้ายเล็กน้อย)
-            drawTempBadge(ctx, centerX - 35, centerY + 25, tempTertiary);
+            drawTempBadge(ctx, centerX - (35*physScale), centerY + (25*physScale), tempTertiary, physScale);
 
             ctx.restore();
         }
@@ -589,21 +585,21 @@
             let fricClass = "", fricText = "";
             if (mu < 0.4) {
                 fricClass = "bg-emerald-50 border-emerald-300 text-emerald-800";
-                fricText = "🟢 <b>แรงเสียดทานต่ำ (ดีมาก):</b> ความร้อนสะสมที่โซน 2 น้อย ช่วยยืดอายุมีด เศษไหลออกลื่นไหล";
+                fricText = "🟢 <b>แรงเสียดทานต่ำ:</b> ความร้อนสะสมโซน 2 น้อย ยืดอายุมีด";
             } else if (mu <= 0.8) {
                 fricClass = "bg-amber-50 border-amber-300 text-amber-800";
-                fricText = "🟡 <b>แรงเสียดทานปานกลาง (ปกติ):</b> สภาวะการตัดเฉือนทั่วไปสำหรับวัสดุส่วนใหญ่";
+                fricText = "🟡 <b>แรงเสียดทานปานกลาง:</b> สภาวะการตัดเฉือนทั่วไป";
             } else {
                 fricClass = "bg-red-50 border-red-300 text-red-800";
-                fricText = "🔴 <b>แรงเสียดทานสูงเกินไป (แย่):</b> โซนความร้อนสะสมสูง เสี่ยงเกิดเศษพอกติดหน้ามีด (BUE) และมีดสึกหรอเร็ว";
+                fricText = "🔴 <b>แรงเสียดทานสูง:</b> โซนความร้อนสูง เสี่ยงเกิด BUE";
             }
-            analysisFriction.className = `mb-2 text-[11px] sm:text-xs p-2.5 rounded-lg border leading-relaxed ${fricClass}`;
+            analysisFriction.className = `mb-1.5 md:mb-2 text-[10px] sm:text-xs p-2 md:p-2.5 rounded-lg border leading-relaxed ${fricClass}`;
             analysisFriction.innerHTML = fricText;
 
             let energyClass = "bg-blue-50 border-blue-300 text-blue-800";
-            let energyText = `🔹 <b>พลังงานรวม:</b> ใช้กำลังตัด ${resPc.innerText} (ลดความฝืด = ลดความร้อนลงได้)`;
+            let energyText = `🔹 <b>พลังงานรวม:</b> ใช้กำลัง ${resPc.innerText}`;
             
-            analysisEnergy.className = `text-[11px] sm:text-xs p-2.5 rounded-lg border leading-relaxed ${energyClass}`;
+            analysisEnergy.className = `text-[10px] sm:text-xs p-2 md:p-2.5 rounded-lg border leading-relaxed ${energyClass}`;
             analysisEnergy.innerHTML = energyText;
         }
 
@@ -680,13 +676,11 @@
             const Ps = (Fs * Vs) / 60;
             const Pf = (F * Vc) / 60;
             
-            // คำนวณอุณหภูมิโดยประมาณ (Educational Estimation) เพื่อให้เห็นภาพผลกระทบ
-            const T0 = 30; // อุณหภูมิห้อง
+            const T0 = 30; 
             const tPrimary = Math.round(T0 + (Ps * 0.45) + (V * 0.2)); 
-            const tSecondary = Math.round(tPrimary + (Pf * 0.8) + (Vc * 0.5)); // มักจะร้อนที่สุดจากแรงเสียดทาน
+            const tSecondary = Math.round(tPrimary + (Pf * 0.8) + (Vc * 0.5)); 
             const tTertiary = Math.round(T0 + (V * 0.8) + (Fc * 0.05));
 
-            // อัปเดต Legend ของ Heat Zones
             if(legendHeat) {
                 legendHeat.style.display = toggleHeat.checked ? 'block' : 'none';
                 if(toggleHeat.checked) {
@@ -719,7 +713,6 @@
 
             updateAnalysis(mu, phi, alpha, betaDeg);
             
-            // ส่งค่าอุณหภูมิที่ประมาณการไปวาดบน Canvas
             draw(alpha, gamma, phi, Fc, Ft, F, N, Fs, Fn, betaDeg, V, Vc, Vs, t1_val, tPrimary, tSecondary, tTertiary);
         }
 
@@ -729,40 +722,46 @@
             const width = canvas.width;
             const height = canvas.height;
             
+            // Dynamic Scaling for Responsive Canvas
+            // อ้างอิงขนาดพื้นฐานที่ 800x600 ให้ย่อหรือขยายตามขนาดจอจริง
+            const physScale = Math.min(width / 800, height / 600) * 1.15;
+            
             const maxForce = 1300; 
-            const availableSpace = Math.min(width * 0.7, height * 0.8);
+            const availableSpace = Math.min(width * 0.6, height * 0.7);
             const scaleForce = availableSpace / maxForce;
             
             const centerX = width * 0.45; 
-            const centerY = height * 0.7; 
+            const centerY = height * 0.75; 
 
             const pRad = degToRad(phi);
             const aRad = degToRad(alpha);
             const gRad = degToRad(gamma);
 
-            const t1_visual = t1_val * 300; 
+            const t1_visual = t1_val * 280 * physScale; 
             
             const shearX = centerX - t1_visual / Math.tan(pRad);
             const shearY = centerY - t1_visual;
 
             // ==========================================
-            // 1. วาดโครงสร้างทางกายภาพ (ชิ้นงาน, เศษ, มีด)
+            // 1. วาดโครงสร้างทางกายภาพ (ย่อขยายด้วย physScale)
             // ==========================================
+            const baseW = 450 * physScale;
+
             ctx.fillStyle = "#f1f5f9";
             ctx.strokeStyle = "#cbd5e1";
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(centerX - 450, shearY); 
+            ctx.moveTo(centerX - baseW, shearY); 
             ctx.lineTo(shearX, shearY); 
             ctx.lineTo(centerX, centerY); 
-            ctx.lineTo(centerX + 450, centerY); 
-            ctx.lineTo(centerX + 450, height); 
-            ctx.lineTo(centerX - 450, height); 
+            ctx.lineTo(centerX + baseW, centerY); 
+            ctx.lineTo(centerX + baseW, height); 
+            ctx.lineTo(centerX - baseW, height); 
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            const chipLen = 220;
+            const chipLen = 200 * physScale;
             const rakeDirX = Math.sin(aRad);
             const rakeDirY = -Math.cos(aRad);
             
@@ -776,15 +775,15 @@
             ctx.fill();
             ctx.stroke();
 
-            const L_rake = 280;     
-            const toolWidth = 160;  
+            const L_rake = 250 * physScale;     
+            const toolWidth = 140 * physScale;  
             
             const dy = -toolWidth * Math.tan(gRad) / (1 + Math.tan(aRad) * Math.tan(gRad));
             const dx = toolWidth + dy * Math.tan(aRad);
 
             ctx.fillStyle = "#fee2e2"; 
             ctx.strokeStyle = "#ef4444"; 
-            ctx.lineWidth = 3.5;
+            ctx.lineWidth = 3.5 * Math.min(physScale, 1);
             
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
@@ -798,44 +797,44 @@
             ctx.stroke();
 
             // ==========================================
-            // 1.5 วาดโซนความร้อน (Heat Zones)
+            // 1.5 วาดโซนความร้อน
             // ==========================================
             if (toggleHeat.checked) {
-                drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tPrimary, tSecondary, tTertiary);
+                drawHeatZones(ctx, centerX, centerY, shearX, shearY, aRad, pRad, chipLen, tPrimary, tSecondary, tTertiary, physScale);
             }
 
             // ==========================================
             // 1.6 วาด Label โครงสร้าง
             // ==========================================
-            drawTextLabel(centerX - 250, centerY + 80, "ชิ้นงาน (Workpiece)", "#ffffff", "#334155");
-            drawTextLabel(centerX + 90, centerY - 60, "มีดตัด (Tool)", "#ef4444", "#ffffff");
+            drawTextLabel(centerX - (200*physScale), centerY + (60*physScale), "ชิ้นงาน (Workpiece)", "#ffffff", "#334155", physScale);
+            drawTextLabel(centerX + (80*physScale), centerY - (50*physScale), "มีดตัด (Tool)", "#ef4444", "#ffffff", physScale);
             
             const midChipX = (centerX + shearX) / 2 + (chipLen / 2.2) * rakeDirX;
             const midChipY = (centerY + shearY) / 2 + (chipLen / 2.2) * rakeDirY;
-            drawTextLabel(midChipX, midChipY, "เศษตัด (Chip)", "#ffffff", "#334155");
+            drawTextLabel(midChipX, midChipY, "เศษตัด (Chip)", "#ffffff", "#334155", physScale);
 
-            drawArrow(centerX - 350, shearY + t1_visual/2, centerX - 180, shearY + t1_visual/2, "#ea580c", "ทิศทางการตัด (V)", { lineWidth: 4, textSide: 1, textDist: 15 });
+            drawArrow(centerX - (300*physScale), shearY + t1_visual/2, centerX - (150*physScale), shearY + t1_visual/2, "#ea580c", "ทิศทางตัด (V)", { lineWidth: 4, textSide: 1, textDist: 15, physScale: physScale });
 
             // ==========================================
             // 2. เส้นอ้างอิงและระนาบเฉือน
             // ==========================================
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX, centerY - 150);
+            ctx.lineTo(centerX, centerY - (150*physScale));
             ctx.strokeStyle = "#94a3b8";
             ctx.lineWidth = 1.5;
             ctx.setLineDash([4, 4]);
             ctx.stroke();
             
             ctx.beginPath();
-            ctx.moveTo(centerX + 180, centerY);
-            ctx.lineTo(centerX - 180, centerY);
+            ctx.moveTo(centerX + (150*physScale), centerY);
+            ctx.lineTo(centerX - (150*physScale), centerY);
             ctx.stroke();
             ctx.setLineDash([]);
 
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX - 220 * Math.cos(pRad), centerY - 220 * Math.sin(pRad));
+            ctx.lineTo(centerX - (180*physScale) * Math.cos(pRad), centerY - (180*physScale) * Math.sin(pRad));
             ctx.strokeStyle = "#10b981";
             ctx.setLineDash([4, 4]);
             ctx.lineWidth = 1.5;
@@ -844,7 +843,7 @@
             
             ctx.fillStyle = "#1e293b";
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 5, 0, 2*Math.PI);
+            ctx.arc(centerX, centerY, 4 * Math.max(physScale, 0.7), 0, 2*Math.PI);
             ctx.fill();
 
             // ==========================================
@@ -866,46 +865,35 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            drawArrow(centerX, centerY, rX, rY, "#334155", "R = " + Math.round(R), { lineWidth: 3, dash: [6, 4], textSide: -1, textDist: 25 });
-            drawArrow(centerX, centerY, rX, centerY, "#ef4444", "Fc = " + Math.round(Fc), { lineWidth: 3.5, textSide: 1, textDist: 15 });
-            drawArrow(rX, centerY, rX, rY, "#f43f5e", "Ft = " + Math.round(Ft), { lineWidth: 3.5, textSide: -1, textDist: 20 });
+            drawArrow(centerX, centerY, rX, rY, "#334155", "R=" + Math.round(R), { lineWidth: 3, dash: [6, 4], textSide: -1, textDist: 20, physScale: physScale });
+            drawArrow(centerX, centerY, rX, centerY, "#ef4444", "Fc=" + Math.round(Fc), { lineWidth: 3.5, textSide: 1, textDist: 12, physScale: physScale });
+            drawArrow(rX, centerY, rX, rY, "#f43f5e", "Ft=" + Math.round(Ft), { lineWidth: 3.5, textSide: -1, textDist: 15, physScale: physScale });
 
             const nEndX = centerX + N * Math.cos(aRad) * scaleForce;
             const nEndY = centerY - N * Math.sin(aRad) * scaleForce;
-            drawArrow(centerX, centerY, nEndX, nEndY, "#3b82f6", "N = " + Math.round(N), { lineWidth: 2.5, textSide: 1, textDist: 15 });
-            drawArrow(nEndX, nEndY, rX, rY, "#0ea5e9", "F = " + Math.round(F), { lineWidth: 2.5, textSide: 1, textDist: 15 });
+            drawArrow(centerX, centerY, nEndX, nEndY, "#3b82f6", "N=" + Math.round(N), { lineWidth: 2.5, textSide: 1, textDist: 12, physScale: physScale });
+            drawArrow(nEndX, nEndY, rX, rY, "#0ea5e9", "F=" + Math.round(F), { lineWidth: 2.5, textSide: 1, textDist: 12, physScale: physScale });
 
             const fsEndX = centerX + Fs * Math.cos(pRad) * scaleForce;
             const fsEndY = centerY + Fs * Math.sin(pRad) * scaleForce;
-            drawArrow(centerX, centerY, fsEndX, fsEndY, "#10b981", "Fs = " + Math.round(Fs), { lineWidth: 2.5, textSide: -1, textDist: 15 });
-            drawArrow(fsEndX, fsEndY, rX, rY, "#14b8a6", "Fn = " + Math.round(Fn), { lineWidth: 2.5, textSide: -1, textDist: 15 });
+            drawArrow(centerX, centerY, fsEndX, fsEndY, "#10b981", "Fs=" + Math.round(Fs), { lineWidth: 2.5, textSide: -1, textDist: 12, physScale: physScale });
+            drawArrow(fsEndX, fsEndY, rX, rY, "#14b8a6", "Fn=" + Math.round(Fn), { lineWidth: 2.5, textSide: -1, textDist: 12, physScale: physScale });
 
             // ==========================================
             // 4. วาดส่วนโค้งของมุม (Angles)
             // ==========================================
-            const a_vertical = -Math.PI / 2;
-            const a_rake = -Math.PI / 2 + aRad;
-            drawAngleArc(centerX, centerY, 65, a_vertical, a_rake, "#3b82f6", `α = ${alpha}°`);
-
-            const a_horizontal_left = Math.PI; 
-            const a_shear = Math.PI + pRad;
-            drawAngleArc(centerX, centerY, 90, a_horizontal_left, a_shear, "#10b981", `φ = ${phi.toFixed(1)}°`);
-
-            const a_N = -aRad; 
-            const a_R = Math.atan2(Ft, Fc); 
-            drawAngleArc(centerX, centerY, 50, a_N, a_R, "#f59e0b", `β = ${betaDeg.toFixed(1)}°`);
-
-            const a_horizontal_right = 0; 
-            const a_clearance = -gRad; 
-            drawAngleArc(centerX, centerY, 75, a_horizontal_right, a_clearance, "#a855f7", `γ = ${gamma}°`);
+            drawAngleArc(centerX, centerY, 65, -Math.PI / 2, -Math.PI / 2 + aRad, "#3b82f6", `α=${alpha}°`, physScale);
+            drawAngleArc(centerX, centerY, 90, Math.PI, Math.PI + pRad, "#10b981", `φ=${phi.toFixed(1)}°`, physScale);
+            drawAngleArc(centerX, centerY, 50, -aRad, Math.atan2(Ft, Fc), "#f59e0b", `β=${betaDeg.toFixed(1)}°`, physScale);
+            drawAngleArc(centerX, centerY, 75, 0, -gRad, "#a855f7", `γ=${gamma}°`, physScale);
 
             // ==========================================
             // 5. สามเหลี่ยมความเร็ว (Velocity Triangle)
             // ==========================================
-            const vOriginX = width * 0.25; 
+            const vOriginX = width * 0.22; 
             const vOriginY = height * 0.45; 
             const maxV = 600; 
-            const scaleV = (width * 0.22) / maxV; 
+            const scaleV = (width * 0.2) / maxV; 
 
             const ptA = { x: vOriginX - V * scaleV, y: vOriginY };
             const ptB = { x: vOriginX, y: vOriginY };
@@ -919,26 +907,25 @@
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
             ctx.beginPath();
-            ctx.roundRect(ptA.x - 40, minY - 45, (V * scaleV) + 80, (maxY - minY) + 75, 8);
+            ctx.roundRect(ptA.x - (30*physScale), minY - (35*physScale), (V * scaleV) + (60*physScale), (maxY - minY) + (60*physScale), 8);
             ctx.fill();
             ctx.strokeStyle = "#e2e8f0";
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            drawTextLabel(vOriginX - (V * scaleV)/2, minY - 25, "สามเหลี่ยมความเร็ว (Velocity Triangle)", "#ffffff", "#475569");
+            drawTextLabel(vOriginX - (V * scaleV)/2, minY - (20*physScale), "ความเร็ว (V)", "#ffffff", "#475569", physScale * 0.9);
 
-            drawArrow(ptA.x, ptA.y, ptB.x, ptB.y, "#f97316", `V = ${V}`, { lineWidth: 3.5, textSide: -1, textDist: 15 });
-            drawArrow(ptB.x, ptB.y, ptC.x, ptC.y, "#14b8a6", `Vs = ${Vs.toFixed(0)}`, { lineWidth: 3.5, textSide: 1, textDist: 15 });
-            drawArrow(ptA.x, ptA.y, ptC.x, ptC.y, "#6366f1", `Vc = ${Vc.toFixed(0)}`, { lineWidth: 3.5, textSide: -1, textDist: 15 });
+            drawArrow(ptA.x, ptA.y, ptB.x, ptB.y, "#f97316", `V=${V}`, { lineWidth: 3, textSide: -1, textDist: 12, physScale: physScale });
+            drawArrow(ptB.x, ptB.y, ptC.x, ptC.y, "#14b8a6", `Vs=${Vs.toFixed(0)}`, { lineWidth: 3, textSide: 1, textDist: 12, physScale: physScale });
+            drawArrow(ptA.x, ptA.y, ptC.x, ptC.y, "#6366f1", `Vc=${Vc.toFixed(0)}`, { lineWidth: 3, textSide: -1, textDist: 12, physScale: physScale });
             
             ctx.fillStyle = "#1e293b";
             ctx.beginPath();
-            ctx.arc(ptB.x, ptB.y, 4, 0, 2*Math.PI);
-            ctx.arc(ptA.x, ptA.y, 4, 0, 2*Math.PI);
+            ctx.arc(ptB.x, ptB.y, 3 * Math.max(physScale, 0.7), 0, 2*Math.PI);
+            ctx.arc(ptA.x, ptA.y, 3 * Math.max(physScale, 0.7), 0, 2*Math.PI);
             ctx.fill();
         }
 
-        // ผูก Event
         alphaSlider.addEventListener('input', syncFt);
         betaSlider.addEventListener('input', syncFt);
         fcSlider.addEventListener('input', syncFt);
@@ -948,10 +935,10 @@
         vSlider.addEventListener('input', updateView);
         t1Slider.addEventListener('input', updateView); 
         
-        // ผูก Toggle ของ Heat Zones
         toggleHeat.addEventListener('change', updateView);
-        
         btnExport.addEventListener('click', exportToCSV);
+        
+        // รับค่า Resize ตลอดเวลาเพื่อวาดย่อ/ขยายได้สมูธ
         window.addEventListener('resize', resizeCanvas);
         
         function exportToCSV() {
